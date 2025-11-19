@@ -1,0 +1,11 @@
+{
+  "platformName": "Android",
+  "automationName": "UiAutomator2",
+  "app": "bs://<app-id>",
+  "deviceName": "Samsung Galaxy S23",
+  "bstack:options": {
+    "projectName": "POC Mobile Automation",
+    "buildName": "MAANG-POC",
+    "sessionName": "Login Test"
+  }
+}

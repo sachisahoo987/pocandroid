@@ -1,0 +1,7 @@
+{
+  "platformName": "Android",
+  "automationName": "UiAutomator2",
+  "app": "app-debug.apk",
+  "deviceName": "Android Emulator",
+  "noReset": true
+}
