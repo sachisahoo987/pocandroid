@@ -1,13 +1,21 @@
 package pages;
 
 import base.BasePage;
+import base.DriverFactory;
 import io.appium.java_client.pagefactory.AndroidFindBy;
 import io.appium.java_client.pagefactory.iOSXCUITFindBy;
+import io.cucumber.java.Before;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
 
 public class CartPage extends BasePage {
+
+    @Before
+    public void setup() {
+        DriverFactory.initDriver("android");    // start driver
+        CartPage cartPage = new CartPage();        // now driver is non-null
+    }
 
     /* ====================== PRODUCT PRICES ====================== */
     @AndroidFindBy(id = "com.androidsample.generalstore:id/productPrice")

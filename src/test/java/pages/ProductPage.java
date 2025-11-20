@@ -1,9 +1,11 @@
 package pages;
 
 import base.BasePage;
+import base.DriverFactory;
 import io.appium.java_client.AppiumBy;
 import io.appium.java_client.pagefactory.AndroidFindBy;
 import io.appium.java_client.pagefactory.iOSXCUITFindBy;
+import io.cucumber.java.Before;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.PageFactory;
 import io.appium.java_client.pagefactory.AppiumFieldDecorator;
@@ -13,6 +15,12 @@ import java.util.List;
 import java.util.Map;
 
 public class ProductPage extends BasePage {
+
+    @Before
+    public void setup() {
+        DriverFactory.initDriver("android");    // start driver
+        ProductPage productPage = new ProductPage();        // now driver is non-null
+    }
 
     /* ======================== PRODUCT NAME LIST ======================== */
     @AndroidFindBy(id = "com.androidsample.generalstore:id/productName")

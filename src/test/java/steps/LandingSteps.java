@@ -6,7 +6,11 @@ import static org.testng.Assert.assertTrue;
 
 public class LandingSteps {
 
-    LandingPage landing = new LandingPage();
+    private final LandingPage landing;
+
+    public LandingSteps(LandingPage landing) {
+        this.landing = landing;
+    }
 
     @Given("user is on the landing page")
     public void user_on_landing() {

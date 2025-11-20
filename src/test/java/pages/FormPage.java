@@ -1,15 +1,23 @@
 package pages;
 
 import base.BasePage;
+import base.DriverFactory;
 import io.appium.java_client.AppiumBy;
 import io.appium.java_client.pagefactory.AndroidFindBy;
 import io.appium.java_client.pagefactory.iOSXCUITFindBy;
+import io.cucumber.java.Before;
 import org.openqa.selenium.WebElement;
 import utils.ScrollUtils;
 
 import static com.sun.jna.Platform.isAndroid;
 
 public class FormPage extends BasePage {
+
+    @Before
+    public void setup() {
+        DriverFactory.initDriver("android");    // start driver
+        FormPage formPage = new FormPage();        // now driver is non-null
+    }
 
     /* ====================== COUNTRY DROPDOWN ====================== */
     @AndroidFindBy(id = "com.androidsample.generalstore:id/spinnerCountry")

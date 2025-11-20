@@ -6,8 +6,13 @@ import pages.ProductPage;
 
 public class ProductSteps {
 
-    LandingPage landing = new LandingPage();
-    ProductPage product = new ProductPage();
+    private final LandingPage landing ;
+    private final ProductPage product;
+
+    public ProductSteps(LandingPage landing, ProductPage product) {
+        this.landing = landing;
+        this.product = product;
+    }
 
     @Given("user is on product list page")
     public void on_product_page() {

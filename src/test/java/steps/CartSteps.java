@@ -4,12 +4,17 @@ package steps;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import pages.CartPage;
+
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertEquals;
 
 public class CartSteps {
 
-    CartPage cart = new CartPage();
+    private final CartPage cart;
+
+    public CartSteps(CartPage cart) {
+        this.cart = cart;
+    }
 
     @Given("user is on cart page")
     public void user_is_on_cart_page() {

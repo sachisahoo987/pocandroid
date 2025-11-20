@@ -7,12 +7,16 @@ import io.appium.java_client.AppiumBy;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.pagefactory.AndroidFindBy;
 import io.appium.java_client.pagefactory.iOSXCUITFindBy;
+import io.cucumber.java.Before;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.PageFactory;
-import io.appium.java_client.pagefactory.AppiumFieldDecorator;
 
 public class LandingPage extends BasePage {
 
+    @Before
+    public void setup() {
+        DriverFactory.initDriver("android");    // start driver
+        LandingPage landingPage = new LandingPage();        // now driver is non-null
+    }
 
     /* ===================== LOCATORS ===================== */
 

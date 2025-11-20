@@ -9,13 +9,18 @@ import pages.CartPage;
 import pages.FormPage;
 import pages.ProductPage;
 import listeners.ExtentListener;
-import utils.GestureUtils;
 
 public class GeneralStoreSteps {
 
-    private final FormPage form = new FormPage();
-    private final ProductPage product = new ProductPage();
-    private final CartPage cart = new CartPage();
+    private final FormPage form ;
+    private final ProductPage product ;
+    private final CartPage cart ;
+
+    public GeneralStoreSteps(FormPage form, ProductPage product, CartPage cart) {
+        this.form = form;
+        this.product = product;
+        this.cart = cart;
+    }
 
     @Given("the app is launched")
     public void app_launched() {
