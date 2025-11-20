@@ -3,17 +3,16 @@ package base;
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
-import utils.ConfigReader;
 import listeners.ExtentListener;
+import utils.ConfigReader;
 
 public class Hooks {
 
     @Before(order = 1)
-    public void beforeScenario(Scenario scenario) {
-        ConfigReader.init();
-        String platform = System.getProperty("platform", ConfigReader.get("platform"));
+    public void beforeScenario() {
+        String platform = System.getProperty("platform", ConfigReader.getOrDefault("platform", "android"));
         DriverFactory.initDriver(platform);
-        ExtentListener.startTest(scenario.getName());
+        ExtentListener.startTest(Thread.currentThread().getName());
     }
 
     @After(order = 1)
@@ -25,3 +24,4 @@ public class Hooks {
         ExtentListener.endTest();
     }
 }
+

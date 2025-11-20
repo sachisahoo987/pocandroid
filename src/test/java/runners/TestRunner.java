@@ -6,9 +6,9 @@ import org.testng.annotations.DataProvider;
 
 @CucumberOptions(
         features = "src/test/resources/features",
-        glue = {"base", "steps", "listeners"},
-        plugin = {"pretty","json:target/cucumber.json","html:target/cucumber-html-report"},
-        tags = "@smoke"
+        glue = {"steps", "base", "listeners", "utils", "pages"},
+        plugin = {"pretty", "json:target/cucumber.json", "html:target/cucumber-html-report"},
+        monochrome = true
 )
 public class TestRunner extends AbstractTestNGCucumberTests {
 

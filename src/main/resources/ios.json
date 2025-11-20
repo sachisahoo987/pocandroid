@@ -1,0 +1,9 @@
+{
+  "platformName": "iOS",
+  "automationName": "XCUITest",
+  "deviceName": "iPhone 14",
+  "platformVersion": "16",
+  "app": "app/GeneralStore-iOS.app",
+  "newCommandTimeout": 300,
+  "noReset": true
+}

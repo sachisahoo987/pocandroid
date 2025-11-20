@@ -1,7 +1,12 @@
 {
   "platformName": "Android",
   "automationName": "UiAutomator2",
-  "app": "app-debug.apk",
-  "deviceName": "Android Emulator",
-  "noReset": true
+  "app": "${app_path}",
+  "deviceName": "emulator-5556",
+  "noReset": true,
+  "newCommandTimeout": 3600,
+  "uiautomator2ServerLaunchTimeout": 120000
 }
+
+
+

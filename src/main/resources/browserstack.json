@@ -1,11 +1,27 @@
 {
-  "platformName": "Android",
-  "automationName": "UiAutomator2",
-  "app": "bs://<app-id>",
-  "deviceName": "Samsung Galaxy S23",
-  "bstack:options": {
-    "projectName": "POC Mobile Automation",
-    "buildName": "MAANG-POC",
-    "sessionName": "Login Test"
+  "server": "hub-cloud.browserstack.com",
+  "userName": "${BROWSERSTACK_USERNAME}",
+  "accessKey": "${BROWSERSTACK_ACCESS_KEY}",
+
+  "androidCapabilities": {
+    "projectName": "Mobile Automation POC",
+    "buildName": "Android-Pipeline",
+    "sessionName": "General Store Test - Android",
+    "platformName": "Android",
+    "automationName": "UiAutomator2",
+    "deviceName": "Google Pixel 6",
+    "platformVersion": "13",
+    "app": "bs://<your-android-app-id>"
+  },
+
+  "iosCapabilities": {
+    "projectName": "Mobile Automation POC",
+    "buildName": "iOS-Pipeline",
+    "sessionName": "General Store Test - iOS",
+    "platformName": "iOS",
+    "automationName": "XCUITest",
+    "deviceName": "iPhone 14",
+    "platformVersion": "16",
+    "app": "bs://<your-ios-app-id>"
   }
 }
