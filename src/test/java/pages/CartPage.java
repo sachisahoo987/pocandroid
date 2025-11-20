@@ -2,26 +2,40 @@ package pages;
 
 import base.BasePage;
 import io.appium.java_client.pagefactory.AndroidFindBy;
+import io.appium.java_client.pagefactory.iOSXCUITFindBy;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
 
 public class CartPage extends BasePage {
 
+    /* ====================== PRODUCT PRICES ====================== */
     @AndroidFindBy(id = "com.androidsample.generalstore:id/productPrice")
+    @iOSXCUITFindBy(xpath = "//XCUIElementTypeStaticText[contains(@name,'$')]")
     private List<WebElement> productPrices;
 
+    /* ====================== TOTAL AMOUNT ====================== */
     @AndroidFindBy(id = "com.androidsample.generalstore:id/totalAmountLbl")
+    @iOSXCUITFindBy(accessibility = "total_amount")
     private WebElement totalAmount;
 
+    /* ====================== TERMS BUTTON ====================== */
     @AndroidFindBy(id = "com.androidsample.generalstore:id/termsButton")
+    @iOSXCUITFindBy(accessibility = "terms_button")
     private WebElement termsButton;
+
+
+    /* ============================================================
+       BUSINESS METHODS
+       ============================================================ */
 
     public double sumOfProductPrices() {
         double sum = 0.0;
         for (WebElement p : productPrices) {
             String txt = p.getText().replaceAll("[^0-9.]", "");
-            if (!txt.isEmpty()) sum += Double.parseDouble(txt);
+            if (!txt.isEmpty()) {
+                sum += Double.parseDouble(txt);
+            }
         }
         return sum;
     }
@@ -34,4 +48,17 @@ public class CartPage extends BasePage {
     public void openTerms() {
         termsButton.click();
     }
+
+    public boolean isCartPageLoaded() {
+        try {
+            return totalAmount.isDisplayed();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public String getTotalAmount() {
+        return totalAmount.getText();
+    }
+
 }

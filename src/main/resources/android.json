@@ -1,12 +1,9 @@
 {
   "platformName": "Android",
-  "automationName": "UiAutomator2",
-  "app": "${app_path}",
-  "deviceName": "emulator-5556",
-  "noReset": true,
-  "newCommandTimeout": 3600,
-  "uiautomator2ServerLaunchTimeout": 120000
+  "appium:automationName": "UiAutomator2",
+  "appium:deviceName": "emulator-5554",
+  "appium:appPackage": "com.androidsample.generalstore",
+  "appium:appActivity": "com.androidsample.generalstore.SplashActivity",
+  "appium:autoGrantPermissions": true,
+  "appium:appWaitActivity": "*"
 }
-
-
-

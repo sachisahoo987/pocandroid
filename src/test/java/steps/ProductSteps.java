@@ -1,13 +1,13 @@
 package steps;
 
 import io.cucumber.java.en.*;
-import pages.ProductListPage;
 import pages.LandingPage;
+import pages.ProductPage;
 
 public class ProductSteps {
 
     LandingPage landing = new LandingPage();
-    ProductListPage product = new ProductListPage();
+    ProductPage product = new ProductPage();
 
     @Given("user is on product list page")
     public void on_product_page() {

@@ -8,10 +8,12 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
-
 public abstract class BasePage {
 
-    protected final AppiumDriver<?> driver;
+
+    public static final ThreadLocal<AppiumDriver> DRIVER = new ThreadLocal<>();
+
+    protected AppiumDriver driver = DRIVER.get();
 
     protected BasePage() {
         this.driver = DriverFactory.getDriver();
@@ -25,4 +27,17 @@ public abstract class BasePage {
     protected void waitForVisible(WebElement element) {
         waitForVisible(element, 20);
     }
+
+    protected boolean isAndroid() {
+        return String.valueOf(
+                driver.getCapabilities().getCapability("platformName")
+        ).equalsIgnoreCase("android");
+    }
+
+    protected boolean isIOS() {
+        return String.valueOf(
+                driver.getCapabilities().getCapability("platformName")
+        ).equalsIgnoreCase("ios");
+    }
+
 }

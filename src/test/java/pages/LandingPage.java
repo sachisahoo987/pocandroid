@@ -1,41 +1,73 @@
 package pages;
 
-import base.DriverManager;
-import io.appium.java_client.android.AndroidDriver;
-import org.openqa.selenium.By;
 
-public class LandingPage {
+import base.BasePage;
+import base.DriverFactory;
+import io.appium.java_client.AppiumBy;
+import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.pagefactory.AndroidFindBy;
+import io.appium.java_client.pagefactory.iOSXCUITFindBy;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.PageFactory;
+import io.appium.java_client.pagefactory.AppiumFieldDecorator;
 
-    private final AndroidDriver driver;
+public class LandingPage extends BasePage {
 
-    public LandingPage() {
-        this.driver = DriverManager.getDriver();
-    }
 
-    private final By countryDropdown = By.id("android:id/text1");
-    private final By nameField = By.id("com.androidsample.generalstore:id/nameField");
-    private final By maleButton = By.id("com.androidsample.generalstore:id/radioMale");
-    private final By femaleButton = By.id("com.androidsample.generalstore:id/radioFemale");
-    private final By shopButton = By.id("com.androidsample.generalstore:id/btnLetsShop");
+    /* ===================== LOCATORS ===================== */
+
+    @AndroidFindBy(id = "android:id/text1")
+    @iOSXCUITFindBy(accessibility = "country_dropdown")
+    private WebElement countryDropdown;
+
+    @AndroidFindBy(id = "com.androidsample.generalstore:id/nameField")
+    @iOSXCUITFindBy(xpath = "//XCUIElementTypeTextField")
+    private WebElement nameField;
+
+    @AndroidFindBy(id = "com.androidsample.generalstore:id/radioMale")
+    @iOSXCUITFindBy(accessibility = "gender_male")
+    private WebElement maleButton;
+
+    @AndroidFindBy(id = "com.androidsample.generalstore:id/radioFemale")
+    @iOSXCUITFindBy(accessibility = "gender_female")
+    private WebElement femaleButton;
+
+    @AndroidFindBy(id = "com.androidsample.generalstore:id/btnLetsShop")
+    @iOSXCUITFindBy(accessibility = "lets_shop_btn")
+    private WebElement shopButton;
+
+
+    /* ===================== ACTIONS ===================== */
 
     public void selectCountry(String country) {
-        driver.findElement(countryDropdown).click();
-        driver.findElement(By.xpath("//android.widget.TextView[@text='" + country + "']")).click();
+        countryDropdown.click();
+
+        if (isAndroid()) {
+            driver.findElement(
+                            AppiumBy.androidUIAutomator(
+                                    "new UiSelector().text(\"" + country + "\")"))
+                    .click();
+        } else { // iOS
+            driver.findElement(
+                    AppiumBy.iOSClassChain(
+                            "**/XCUIElementTypeStaticText[`label == \"" + country + "\"`]"
+                    )).click();
+        }
     }
 
     public void enterName(String name) {
-        driver.findElement(nameField).sendKeys(name);
-        driver.hideKeyboard();
+        nameField.clear();
+        nameField.sendKeys(name);
     }
 
     public void selectGender(String gender) {
         if (gender.equalsIgnoreCase("male"))
-            driver.findElement(maleButton).click();
+            maleButton.click();
         else
-            driver.findElement(femaleButton).click();
+            femaleButton.click();
     }
 
     public void clickShop() {
-        driver.findElement(shopButton).click();
+        shopButton.click();
     }
 }

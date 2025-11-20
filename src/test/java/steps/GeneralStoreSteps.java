@@ -1,6 +1,9 @@
 package steps;
 
-import io.cucumber.java.en.*;
+
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
 import org.testng.Assert;
 import pages.CartPage;
 import pages.FormPage;

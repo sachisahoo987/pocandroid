@@ -35,17 +35,25 @@ public final class ExtentListener {
         if (currentTest.get() != null) currentTest.get().fail(msg);
     }
 
-    public static void captureScreenshot(AppiumDriver<?> driver, String title) {
+    public static void captureScreenshot(AppiumDriver driver, String title) {
         try {
-            if (driver == null) return;
+            if (driver == null) {
+                return;
+            }
+
             String base64 = ((TakesScreenshot) driver).getScreenshotAs(OutputType.BASE64);
+
             if (currentTest.get() != null) {
                 currentTest.get().addScreenCaptureFromBase64String(base64, title);
             }
+
         } catch (Exception e) {
-            if (currentTest.get() != null) currentTest.get().warning("Screenshot failed: " + e.getMessage());
+            if (currentTest.get() != null) {
+                currentTest.get().warning("Screenshot failed: " + e.getMessage());
+            }
         }
     }
+
 
     public static void endTest() {
         extent.flush();

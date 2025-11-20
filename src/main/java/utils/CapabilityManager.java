@@ -1,6 +1,7 @@
 package utils;
 
-import org.json.JSONObject;
+
+import browserstack.shaded.org.json.JSONObject;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import java.io.IOException;
@@ -30,13 +31,56 @@ public final class CapabilityManager {
 
         try {
             if (lowerKey.contains("ios")) {
+
+                // Check for IPA inside resources/apps/
+                String appFolder = System.getProperty("user.dir") + "/src/main/resources/apps/";
+                String ipaPath = ApkFinder.findApkOrIpa(appFolder, "ipa");
+
+                if (ipaPath != null) {
+                    System.out.println("📱 Using IPA from folder: " + ipaPath);
+                    return loadCapabilitiesFromJson(
+                            "src/main/resources/ios.json",
+                            "${ios_app_path}",
+                            ipaPath
+                    );
+                }
+
+                // Fallback to JSON (ios_app_path)
                 String appPath = ConfigReader.get("ios_app_path");
-                return loadCapabilitiesFromJson("src/main/resources/ios.json", "${ios_app_path}", appPath);
+                System.out.println("📱 Using IPA from JSON config: " + appPath);
+
+                return loadCapabilitiesFromJson(
+                        "src/main/resources/ios.json",
+                        "${ios_app_path}",
+                        appPath
+                );
+
             } else {
-                // Default to Android logic
-                String appPath = ConfigReader.getOrDefault("app_path", "app/app-debug.apk");
-                return loadCapabilitiesFromJson("src/main/resources/android.json", "${app_path}", appPath);
+
+                // ANDROID LOGIC
+                String appFolder = System.getProperty("user.dir") + "/src/main/resources/apps/";
+                String apkPath = ApkFinder.findApkOrIpa(appFolder, "apk");
+
+                if (apkPath != null) {
+                    System.out.println("🤖 Using APK from folder: " + apkPath);
+                    return loadCapabilitiesFromJson(
+                            "src/main/resources/android.json",
+                            "${app_path}",
+                            apkPath
+                    );
+                }
+
+                // Fallback to JSON
+                String appPath = ConfigReader.getOrDefault("app_path", "GeneralStore.apk");
+                System.out.println("🤖 Using APK from JSON config: " + appPath);
+
+                return loadCapabilitiesFromJson(
+                        "src/main/resources/android.json",
+                        "${app_path}",
+                        appPath
+                );
             }
+
         } catch (IOException e) {
             throw new RuntimeException("Failed to load capabilities for platform: " + platformKey +
                     ". Error: " + e.getMessage(), e);
