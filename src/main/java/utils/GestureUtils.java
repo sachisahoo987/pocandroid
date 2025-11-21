@@ -1,7 +1,6 @@
 package utils;
 
 import base.DriverFactory;
-import io.appium.java_client.AppiumDriver;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 
@@ -13,7 +12,7 @@ public final class GestureUtils {
     private GestureUtils() {}
 
     private static JavascriptExecutor js() {
-        return (JavascriptExecutor) DriverFactory.getDriver();
+        return DriverFactory.getDriver();
     }
 
     /* =========================================================================

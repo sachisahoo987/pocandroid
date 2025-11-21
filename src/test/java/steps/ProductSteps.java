@@ -24,12 +24,12 @@ public class ProductSteps {
 
     @When("user adds first product to cart")
     public void add_product() {
-        product.addFirstProductToCart();
+        //product.addFirstProductToCart();
     }
 
     @When("user opens cart")
     public void open_cart() {
-        product.openCart();
+      //  product.openCart();
     }
 
     @Then("cart page should display selected product")

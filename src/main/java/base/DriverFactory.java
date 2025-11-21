@@ -2,12 +2,13 @@ package base;
 
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.android.options.UiAutomator2Options;
 import io.appium.java_client.ios.IOSDriver;
-import org.openqa.selenium.remote.DesiredCapabilities;
-import utils.CapabilityManager;
+import io.appium.java_client.ios.options.XCUITestOptions;
 import utils.ConfigReader;
 
 import java.net.URL;
+import java.time.Duration;
 
 public final class DriverFactory {
 
@@ -17,23 +18,63 @@ public final class DriverFactory {
 
     public static void initDriver(String platform) {
         try {
-            if (DRIVER.get() != null) return;  // Driver already initialized for this thread
+            if (DRIVER.get() != null) return;
 
             String appiumUrl = ConfigReader.getOrDefault("appium_url", "http://127.0.0.1:4723");
-            DesiredCapabilities caps = CapabilityManager.getCapabilities(platform);
-
             if (platform.equalsIgnoreCase("android")) {
-                DRIVER.set(new AndroidDriver(new URL(appiumUrl), caps));
-            }
-            else if (platform.equalsIgnoreCase("ios")) {
-                DRIVER.set(new IOSDriver(new URL(appiumUrl), caps));
-            }
-            else {
-                throw new IllegalArgumentException("Invalid platform: " + platform);
+
+                UiAutomator2Options options = new UiAutomator2Options()
+                        .setPlatformName("Android")
+                        .setDeviceName("Pixel_2_API_27")
+                        .setUdid("emulator-5554")
+                        .setAutomationName("UiAutomator2")
+                        .setAppPackage("com.androidsample.generalstore")
+                        .setAppActivity("com.androidsample.generalstore.SplashActivity")
+                        .setAppWaitActivity("com.androidsample.generalstore.*")
+                        .setAutoGrantPermissions(true)
+                        .setDisableWindowAnimation(true)
+                        .setSkipDeviceInitialization(true)
+                        .setSkipServerInstallation(true)
+                        .setIgnoreHiddenApiPolicyError(true)
+                        .setNewCommandTimeout(Duration.ofSeconds(120));
+
+/*
+                UiAutomator2Options options = new UiAutomator2Options()
+                        .setPlatformName("Android")
+                        .setDeviceName(ConfigReader.getOrDefault("device_name", "emulator-5554"))
+                        .setAutomationName("UiAutomator2")
+                        .setUdid(ConfigReader.getOrDefault("udid", "emulator-5554"))
+                        .setAppPackage(ConfigReader.getOrDefault("app_package", "com.androidsample.generalstore"))
+                        .setAppActivity(ConfigReader.getOrDefault("app_activity", "com.androidsample.generalstore.SplashActivity"))
+                        .setAppWaitActivity(ConfigReader.getOrDefault("app_wait_activity", "com.androidsample.generalstore.*"))
+                        .setAutoGrantPermissions(true)
+                        // helpful options for older APKs
+                        .setDisableWindowAnimation(true)
+                        .setSkipDeviceInitialization(true)
+                        .setSkipServerInstallation(true)
+                        .setNewCommandTimeout(Duration.ofSeconds(120));*/
+
+                // optional: set explicit platform version for Android 9 emulators
+                String platformVersion = ConfigReader.get("platform_version");
+                if (platformVersion != null && !platformVersion.isBlank()) {
+                    options.setPlatformVersion(platformVersion);
+                }
+
+                DRIVER.set(new AndroidDriver(new URL(appiumUrl), options));
+            } else if (platform.equalsIgnoreCase("ios")) {
+
+                XCUITestOptions options = new XCUITestOptions()
+                        .setDeviceName(ConfigReader.getOrDefault("ios_device_name", "iPhone 15"))
+                        .setPlatformVersion(ConfigReader.getOrDefault("ios_platform_version", "17.0"))
+                        .setBundleId(ConfigReader.getOrDefault("ios_bundle_id", "your.ios.app"));
+
+                DRIVER.set(new IOSDriver(new URL(appiumUrl), options));
+            } else {
+                throw new IllegalArgumentException("Unsupported platform: " + platform);
             }
 
         } catch (Exception e) {
-            throw new RuntimeException("Failed to initialize Appium driver: " + e.getMessage(), e);
+            throw new RuntimeException("Failed to initialize driver → " + e.getMessage(), e);
         }
     }
 
@@ -41,17 +82,10 @@ public final class DriverFactory {
         return DRIVER.get();
     }
 
-    public static void setDriver(AppiumDriver driver) {
-        DRIVER.set(driver);
-    }
-
     public static void quitDriver() {
-        AppiumDriver driver = DRIVER.get();
-        if (driver != null) {
-            try {
-                driver.quit();
-            } catch (Exception ignored) {
-            }
+        AppiumDriver d = DRIVER.get();
+        if (d != null) {
+            try { d.quit(); } catch (Exception ignored) {}
             DRIVER.remove();
         }
     }

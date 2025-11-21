@@ -4,20 +4,18 @@ package pages;
 import base.BasePage;
 import base.DriverFactory;
 import io.appium.java_client.AppiumBy;
-import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.pagefactory.AndroidFindBy;
+import io.appium.java_client.pagefactory.AppiumFieldDecorator;
 import io.appium.java_client.pagefactory.iOSXCUITFindBy;
 import io.cucumber.java.Before;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.PageFactory;
 
 public class LandingPage extends BasePage {
 
-    @Before
-    public void setup() {
-        DriverFactory.initDriver("android");    // start driver
-        LandingPage landingPage = new LandingPage();        // now driver is non-null
+    public LandingPage() {
+        PageFactory.initElements(new AppiumFieldDecorator(driver), this);
     }
-
     /* ===================== LOCATORS ===================== */
 
     @AndroidFindBy(id = "android:id/text1")
