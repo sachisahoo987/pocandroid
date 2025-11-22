@@ -21,47 +21,40 @@ public final class DriverFactory {
             if (DRIVER.get() != null) return;
 
             String appiumUrl = ConfigReader.getOrDefault("appium_url", "http://127.0.0.1:4723");
+
+            /* ============================================================
+               ANDROID 15 (API 36.0) – Pixel 8 Emulator
+               ============================================================ */
             if (platform.equalsIgnoreCase("android")) {
 
-                UiAutomator2Options options = new UiAutomator2Options()
-                        .setPlatformName("Android")
-                        .setDeviceName("Pixel_2_API_27")
-                        .setUdid("emulator-5554")
-                        .setAutomationName("UiAutomator2")
-                        .setAppPackage("com.androidsample.generalstore")
-                        .setAppActivity("com.androidsample.generalstore.SplashActivity")
-                        .setAppWaitActivity("com.androidsample.generalstore.*")
-                        .setAutoGrantPermissions(true)
-                        .setDisableWindowAnimation(true)
-                        .setSkipDeviceInitialization(true)
-                        .setSkipServerInstallation(true)
-                        .setIgnoreHiddenApiPolicyError(true)
-                        .setNewCommandTimeout(Duration.ofSeconds(120));
+                UiAutomator2Options options = new UiAutomator2Options();
 
-/*
-                UiAutomator2Options options = new UiAutomator2Options()
-                        .setPlatformName("Android")
-                        .setDeviceName(ConfigReader.getOrDefault("device_name", "emulator-5554"))
-                        .setAutomationName("UiAutomator2")
-                        .setUdid(ConfigReader.getOrDefault("udid", "emulator-5554"))
-                        .setAppPackage(ConfigReader.getOrDefault("app_package", "com.androidsample.generalstore"))
-                        .setAppActivity(ConfigReader.getOrDefault("app_activity", "com.androidsample.generalstore.SplashActivity"))
-                        .setAppWaitActivity(ConfigReader.getOrDefault("app_wait_activity", "com.androidsample.generalstore.*"))
-                        .setAutoGrantPermissions(true)
-                        // helpful options for older APKs
-                        .setDisableWindowAnimation(true)
-                        .setSkipDeviceInitialization(true)
-                        .setSkipServerInstallation(true)
-                        .setNewCommandTimeout(Duration.ofSeconds(120));*/
+                options.setPlatformName("Android");
+                options.setDeviceName(ConfigReader.get("device_name"));
+                options.setPlatformVersion(ConfigReader.get("platform_version"));
+                options.setUdid(ConfigReader.get("udid"));
+                options.setAutomationName("UiAutomator2");
 
-                // optional: set explicit platform version for Android 9 emulators
-                String platformVersion = ConfigReader.get("platform_version");
-                if (platformVersion != null && !platformVersion.isBlank()) {
-                    options.setPlatformVersion(platformVersion);
-                }
+                // === App specific ===
+                options.setAppPackage(ConfigReader.get("app_package"));
+                options.setAppActivity(ConfigReader.get("app_activity"));
+                options.setAppWaitActivity(ConfigReader.get("app_wait_activity"));
+
+                // Stable flags for new OS versions
+                options.setAutoGrantPermissions(true);
+                options.setDisableWindowAnimation(true);
+                options.setNoReset(false);
+                options.setNewCommandTimeout(Duration.ofSeconds(1200));
 
                 DRIVER.set(new AndroidDriver(new URL(appiumUrl), options));
-            } else if (platform.equalsIgnoreCase("ios")) {
+                Thread.sleep(30000);
+            }
+
+
+            /* ============================================================
+                iOS SUPPORT (unchanged)
+               ============================================================ */
+            else if (platform.equalsIgnoreCase("ios")) {
 
                 XCUITestOptions options = new XCUITestOptions()
                         .setDeviceName(ConfigReader.getOrDefault("ios_device_name", "iPhone 15"))
@@ -69,7 +62,9 @@ public final class DriverFactory {
                         .setBundleId(ConfigReader.getOrDefault("ios_bundle_id", "your.ios.app"));
 
                 DRIVER.set(new IOSDriver(new URL(appiumUrl), options));
-            } else {
+            }
+
+            else {
                 throw new IllegalArgumentException("Unsupported platform: " + platform);
             }
 

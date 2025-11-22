@@ -16,7 +16,9 @@ public class GeneralStoreSteps {
     public GeneralStoreSteps() {}
 
     @Given("the app is launched")
-    public void app_launched() { /* nothing - hooks started driver */ }
+    public void app_launched() throws InterruptedException {
+        Thread.sleep(30000);
+    }
 
     @When("the user selects country {string}")
     public void select_country(String country) { form.selectCountry(country); }
