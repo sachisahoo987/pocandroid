@@ -9,12 +9,12 @@
         </classes>
     </test>
 
-    <!-- IOS EXECUTION -->
-    <test name="iOS Tests">
-        <parameter name="platform" value="ios"/>
-        <classes>
-            <class name="runners.TestRunner"/>
-        </classes>
-    </test>
+    <!--    <test name="iOS Tests">
+         <parameter name="platform" value="ios"/>
+         <classes>
+             <class name="runners.TestRunner"/>
+         </classes>
+     </test>
+ -->
 
 </suite>

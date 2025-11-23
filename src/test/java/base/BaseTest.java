@@ -5,13 +5,14 @@ import org.testng.annotations.BeforeMethod;
 
 public abstract class BaseTest {
 
-    @BeforeMethod
+  /*  @BeforeMethod
     public void setup() {
-        DriverFactory.initDriver("android"); // or from config
+        String platform = utils.ConfigReader.getOrDefault("platform", "android");
+        DriverFactory.initDriver(platform);
     }
 
     @AfterMethod
     public void tearDown() {
         DriverFactory.quitDriver();
-    }
+    }*/
 }

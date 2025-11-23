@@ -16,9 +16,13 @@ public class GeneralStoreSteps {
     public GeneralStoreSteps() {}
 
     @Given("the app is launched")
-    public void app_launched() throws InterruptedException {
-        Thread.sleep(30000);
+    public void app_launched() {
+        // Replace the Thread.sleep with an explicit wait for an element on the FormPage.
+        FormPage formPage = new FormPage();
+        // wait for the name field (or country spinner) to be visible
+        formPage.waitForFormReady(); // implement this helper on FormPage (see note)
     }
+
 
     @When("the user selects country {string}")
     public void select_country(String country) { form.selectCountry(country); }

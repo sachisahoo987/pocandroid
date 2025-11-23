@@ -5,10 +5,13 @@ import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.options.UiAutomator2Options;
 import io.appium.java_client.ios.IOSDriver;
 import io.appium.java_client.ios.options.XCUITestOptions;
+import org.openqa.selenium.WebElement;
 import utils.ConfigReader;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.net.URL;
 import java.time.Duration;
+import java.util.Optional;
 
 public final class DriverFactory {
 
@@ -20,10 +23,12 @@ public final class DriverFactory {
         try {
             if (DRIVER.get() != null) return;
 
-            String appiumUrl = ConfigReader.getOrDefault("appium_url", "http://127.0.0.1:4723");
+            // Ensure URL includes protocol + host + port
+            String appiumUrl = ConfigReader.getOrDefault("appium_url", "http://127.0.0.1:4723/");
+            if (!appiumUrl.endsWith("/")) appiumUrl = appiumUrl + "/";
 
             /* ============================================================
-               ANDROID 15 (API 36.0) – Pixel 8 Emulator
+               ANDROID
                ============================================================ */
             if (platform.equalsIgnoreCase("android")) {
 
@@ -31,28 +36,45 @@ public final class DriverFactory {
 
                 options.setPlatformName("Android");
                 options.setDeviceName(ConfigReader.get("device_name"));
-                options.setPlatformVersion(ConfigReader.get("platform_version"));
-                options.setUdid(ConfigReader.get("udid"));
-                options.setAutomationName("UiAutomator2");
+                // platform_version may be missing; guard gracefully
+                Optional<String> platformVersion = Optional.ofNullable(ConfigReader.get("platform_version"));
+                platformVersion.ifPresent(options::setPlatformVersion);
 
-                // === App specific ===
+                options.setUdid(ConfigReader.get("udid"));
+                options.setAutomationName(ConfigReader.getOrDefault("automation_name", "UiAutomator2"));
+
+                // App specifics
                 options.setAppPackage(ConfigReader.get("app_package"));
                 options.setAppActivity(ConfigReader.get("app_activity"));
-                options.setAppWaitActivity(ConfigReader.get("app_wait_activity"));
+                options.setAppWaitActivity(ConfigReader.getOrDefault("app_wait_activity", ""));
 
-                // Stable flags for new OS versions
+                // Stability flags
                 options.setAutoGrantPermissions(true);
-                options.setDisableWindowAnimation(true);
-                options.setNoReset(false);
-                options.setNewCommandTimeout(Duration.ofSeconds(1200));
+                // safe capability setting if helper not available
+                options.setCapability("disableWindowAnimation", true);
 
-                DRIVER.set(new AndroidDriver(new URL(appiumUrl), options));
-                Thread.sleep(30000);
+                options.setNoReset(Boolean.parseBoolean(ConfigReader.getOrDefault("no_reset", "false")));
+
+                // new_command_timeout from config (seconds), fallback to 1200
+                int newCmdTimeout = Integer.parseInt(ConfigReader.getOrDefault("new_command_timeout", "1200"));
+                options.setNewCommandTimeout(Duration.ofSeconds(newCmdTimeout));
+
+                // Set adbExecTimeout to reduce instrumentation failures (if supported by client)
+                try {
+                    options.setAdbExecTimeout(Duration.ofSeconds(120));
+                } catch (Exception ignored) {}
+
+                AppiumDriver driver = new AndroidDriver(new URL(appiumUrl), options);
+
+                // set short implicit wait and attach to ThreadLocal
+                driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+                DRIVER.set(driver);
+
+                // don't sleep — instead wait for app to reach known activity in tests / hooks
             }
 
-
             /* ============================================================
-                iOS SUPPORT (unchanged)
+               iOS
                ============================================================ */
             else if (platform.equalsIgnoreCase("ios")) {
 
@@ -61,7 +83,10 @@ public final class DriverFactory {
                         .setPlatformVersion(ConfigReader.getOrDefault("ios_platform_version", "17.0"))
                         .setBundleId(ConfigReader.getOrDefault("ios_bundle_id", "your.ios.app"));
 
-                DRIVER.set(new IOSDriver(new URL(appiumUrl), options));
+
+                AppiumDriver driver = new IOSDriver(new URL(appiumUrl), options);
+                driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+                DRIVER.set(driver);
             }
 
             else {
