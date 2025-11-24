@@ -1,5 +1,6 @@
 package steps;
 
+import io.cucumber.java.Before;
 import io.cucumber.java.en.*;
 import org.testng.Assert;
 import pages.CartPage;
@@ -8,9 +9,16 @@ import pages.ProductPage;
 
 public class GeneralStoreSteps {
 
-    private final FormPage form = new FormPage();
-    private final ProductPage product = new ProductPage();
-    private final CartPage cart = new CartPage();
+    private FormPage form;
+    private ProductPage product;
+    private CartPage cart;
+
+    @Before
+    public void initPages() {
+        form = new FormPage();
+        product = new ProductPage();
+        cart = new CartPage();
+    }
 
     // MUST have public zero-arg constructor (implicit)
     public GeneralStoreSteps() {}

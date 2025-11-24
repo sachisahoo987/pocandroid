@@ -1,0 +1,17 @@
+{
+  "FormPage": {
+    "nameField": "//*[@resource-id='com.androidsample.generalstore:id/nameField']",
+    "countrySpinner": "//*[@resource-id='com.androidsample.generalstore:id/spinnerCountry']",
+    "letsShopBtn": "//*[@resource-id='com.androidsample.generalstore:id/btnLetsShop']"
+  },
+  "ProductPage": {
+    "productName": "//*[@resource-id='com.androidsample.generalstore:id/productName']",
+    "addCartBtn": "//*[@resource-id='com.androidsample.generalstore:id/productAddCart']",
+    "cartBtn": "//*[@resource-id='com.androidsample.generalstore:id/btnCart']"
+  },
+  "CartPage": {
+    "productPrice": "//*[@resource-id='com.androidsample.generalstore:id/productPrice']",
+    "totalAmount": "//*[@resource-id='com.androidsample.generalstore:id/totalAmountLbl']",
+    "termsBtn": "//*[@resource-id='com.androidsample.generalstore:id/termsButton']"
+  }
+}

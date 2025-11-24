@@ -13,100 +13,57 @@
     <properties>
         <java.version>21</java.version>
         <surefire.version>3.2.5</surefire.version>
+        <allure.version>2.25.0</allure.version>
     </properties>
 
     <dependencies>
 
-        <!-- Cucumber Dependencies (All with Selenium exclusions) -->
-
+        <!-- Cucumber (Compatible with Allure) -->
         <dependency>
             <groupId>io.cucumber</groupId>
             <artifactId>cucumber-java</artifactId>
-            <version>7.18.1</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.seleniumhq.selenium</groupId>
-                    <artifactId>selenium-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.seleniumhq.selenium</groupId>
-                    <artifactId>selenium-http</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.seleniumhq.selenium</groupId>
-                    <artifactId>selenium-remote-driver</artifactId>
-                </exclusion>
-            </exclusions>
+            <version>7.14.0</version>
         </dependency>
 
         <dependency>
             <groupId>io.cucumber</groupId>
             <artifactId>cucumber-testng</artifactId>
-            <version>7.18.1</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.seleniumhq.selenium</groupId>
-                    <artifactId>selenium-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.seleniumhq.selenium</groupId>
-                    <artifactId>selenium-http</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.seleniumhq.selenium</groupId>
-                    <artifactId>selenium-remote-driver</artifactId>
-                </exclusion>
-            </exclusions>
+            <version>7.14.0</version>
         </dependency>
 
         <dependency>
             <groupId>io.cucumber</groupId>
             <artifactId>cucumber-core</artifactId>
-            <version>7.18.1</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.seleniumhq.selenium</groupId>
-                    <artifactId>selenium-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.seleniumhq.selenium</groupId>
-                    <artifactId>selenium-http</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.seleniumhq.selenium</groupId>
-                    <artifactId>selenium-remote-driver</artifactId>
-                </exclusion>
-            </exclusions>
+            <version>7.14.0</version>
         </dependency>
 
         <dependency>
             <groupId>io.cucumber</groupId>
             <artifactId>cucumber-plugin</artifactId>
-            <version>7.18.1</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.seleniumhq.selenium</groupId>
-                    <artifactId>selenium-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.seleniumhq.selenium</groupId>
-                    <artifactId>selenium-http</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.seleniumhq.selenium</groupId>
-                    <artifactId>selenium-remote-driver</artifactId>
-                </exclusion>
-            </exclusions>
+            <version>7.14.0</version>
         </dependency>
 
-        <!-- Selenium Latest -->
+        <!-- Allure Reporting -->
+        <dependency>
+            <groupId>io.qameta.allure</groupId>
+            <artifactId>allure-cucumber7-jvm</artifactId>
+            <version>${allure.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.qameta.allure</groupId>
+            <artifactId>allure-testng</artifactId>
+            <version>${allure.version}</version>
+        </dependency>
+
+        <!-- Selenium -->
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-java</artifactId>
             <version>4.27.0</version>
         </dependency>
 
-        <!-- Appium Java Client -->
+        <!-- Appium -->
         <dependency>
             <groupId>io.appium</groupId>
             <artifactId>java-client</artifactId>
@@ -121,24 +78,18 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- Extent Reports -->
-        <dependency>
-            <groupId>com.aventstack</groupId>
-            <artifactId>extentreports</artifactId>
-            <version>5.1.1</version>
-        </dependency>
-
-        <!-- JSON / Jackson -->
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>2.16.0</version>
-        </dependency>
-
+        <!-- JSON -->
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
             <version>20231013</version>
+        </dependency>
+
+        <!-- Jackson -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.16.0</version>
         </dependency>
 
         <!-- Commons IO -->
@@ -148,9 +99,17 @@
             <version>2.14.0</version>
         </dependency>
 
+        <!-- Rest Assured -->
+        <dependency>
+            <groupId>io.rest-assured</groupId>
+            <artifactId>rest-assured</artifactId>
+            <version>5.5.0</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
-    <!-- Build Section -->
+    <!-- BUILD SECTION -->
     <build>
         <plugins>
 
@@ -165,7 +124,25 @@
                 </configuration>
             </plugin>
 
-            <!-- Surefire -->
+            <!-- Allure Maven Plugin for HTML report generation -->
+            <plugin>
+                <groupId>io.qameta.allure</groupId>
+                <artifactId>allure-maven</artifactId>
+                <version>2.12.0</version>
+                <configuration>
+                    <reportVersion>${allure.version}</reportVersion>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>aggregate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Surefire Plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -175,6 +152,14 @@
                     <forkCount>1</forkCount>
                     <reuseForks>false</reuseForks>
 
+                    <!-- System properties passed to tests -->
+                    <systemPropertyVariables>
+                        <takeAllScreens>${takeAllScreens}</takeAllScreens>
+                        <recordAllVideos>${recordAllVideos}</recordAllVideos>
+                        <platform>${platform}</platform>
+                    </systemPropertyVariables>
+
+                    <!-- TestNG Suite -->
                     <suiteXmlFiles>
                         <suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
                     </suiteXmlFiles>
@@ -184,47 +169,22 @@
         </plugins>
     </build>
 
+    <!-- PROFILES -->
     <profiles>
         <profile>
             <id>Regression</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <version>${surefire.version}</version>
-                        <configuration>
-                            <useSystemClassLoader>false</useSystemClassLoader>
-                            <forkCount>1</forkCount>
-                            <reuseForks>false</reuseForks>
-                            <suiteXmlFiles>
-                                <suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
-                            </suiteXmlFiles>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
+            <properties>
+                <platform>android</platform>
+            </properties>
         </profile>
 
         <profile>
             <id>Smoke</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <version>${surefire.version}</version>
-                        <configuration>
-                            <useSystemClassLoader>false</useSystemClassLoader>
-                            <forkCount>1</forkCount>
-                            <reuseForks>false</reuseForks>
-                            <suiteXmlFiles>
-                                <suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
-                            </suiteXmlFiles>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
+            <properties>
+                <platform>android</platform>
+                <takeAllScreens>true</takeAllScreens>
+                <recordAllVideos>false</recordAllVideos>
+            </properties>
         </profile>
     </profiles>
 

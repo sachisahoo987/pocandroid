@@ -2,32 +2,23 @@ package pages;
 
 import base.BasePage;
 import io.appium.java_client.AppiumBy;
-import io.appium.java_client.pagefactory.AndroidFindBy;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import io.appium.java_client.pagefactory.AppiumFieldDecorator;
-import org.openqa.selenium.support.PageFactory;
+import utils.LocatorReader;
 
 import java.util.List;
-import java.util.Map;
 
 public class ProductPage extends BasePage {
 
-    @AndroidFindBy(id = "com.androidsample.generalstore:id/productName")
-    private List<WebElement> productNames;
-
-    @AndroidFindBy(id = "com.androidsample.generalstore:id/productAddCart")
-    private List<WebElement> addToCartButtons;
-
-    @AndroidFindBy(id = "com.androidsample.generalstore:id/btnCart")
-    private WebElement cartBtn;
+    private final By productNameBy = By.xpath(LocatorReader.getLocator("ProductPage", "productName"));
+    private final By addCartBtnBy = By.xpath(LocatorReader.getLocator("ProductPage", "addCartBtn"));
+    private final By cartBtnBy = By.xpath(LocatorReader.getLocator("ProductPage", "cartBtn"));
 
     public ProductPage() { super(); }
 
     public void addProductByName(String name) {
-        // First try currently visible product list
-        List<WebElement> names = driver.findElements(By.id("com.androidsample.generalstore:id/productName"));
-        List<WebElement> adds = driver.findElements(By.id("com.androidsample.generalstore:id/productAddCart"));
+        List<WebElement> names = driver.findElements(productNameBy);
+        List<WebElement> adds = driver.findElements(addCartBtnBy);
 
         for (int i = 0; i < names.size(); i++) {
             if (names.get(i).getText().trim().equalsIgnoreCase(name.trim())) {
@@ -36,24 +27,13 @@ public class ProductPage extends BasePage {
             }
         }
 
-        // Not visible — scroll into view and re-query elements
-        String uiScrollable = String.format(
-                "new UiScrollable(new UiSelector().scrollable(true).instance(0))" +
-                        ".scrollIntoView(new UiSelector().text(\"%s\").instance(0));", name);
-        try {
-            driver.findElement(AppiumBy.androidUIAutomator(uiScrollable));
-        } catch (Exception e) {
-            // fallback: try partial match by description/textContains (safer)
-            String altScroll = String.format(
-                    "new UiScrollable(new UiSelector().scrollable(true).instance(0))" +
-                            ".scrollIntoView(new UiSelector().textContains(\"%s\").instance(0));", name);
-            driver.findElement(AppiumBy.androidUIAutomator(altScroll));
-        }
+        // scroll into view and re-query
+        String uiScroll = String.format("new UiScrollable(new UiSelector().scrollable(true).instance(0))"
+                + ".scrollIntoView(new UiSelector().text(\"%s\").instance(0));", name);
+        driver.findElement(AppiumBy.androidUIAutomator(uiScroll));
 
-        // Re-fetch elements (fresh references)
-        names = driver.findElements(By.id("com.androidsample.generalstore:id/productName"));
-        adds = driver.findElements(By.id("com.androidsample.generalstore:id/productAddCart"));
-
+        names = driver.findElements(productNameBy);
+        adds = driver.findElements(addCartBtnBy);
         for (int i = 0; i < names.size(); i++) {
             if (names.get(i).getText().trim().equalsIgnoreCase(name.trim())) {
                 adds.get(i).click();
@@ -61,8 +41,10 @@ public class ProductPage extends BasePage {
             }
         }
 
-        throw new RuntimeException("Product not found after scroll: " + name);
+        throw new RuntimeException("Product not found: " + name);
     }
 
-    public void goToCart() { cartBtn.click(); }
+    public void goToCart() {
+        driver.findElement(cartBtnBy).click();
+    }
 }
