@@ -28,7 +28,8 @@ public class GeneralStoreSteps {
         // Replace the Thread.sleep with an explicit wait for an element on the FormPage.
         FormPage formPage = new FormPage();
         // wait for the name field (or country spinner) to be visible
-        formPage.waitForFormReady(); // implement this helper on FormPage (see note)
+        formPage.perform("App Launched / Form Ready", () -> formPage.waitForFormReady());
+        //formPage.waitForFormReady(); // implement this helper on FormPage (see note)
     }
 
 
@@ -42,7 +43,7 @@ public class GeneralStoreSteps {
     public void tap_shop() { form.tapLetsShop(); }
 
     @Then("the product list should be displayed")
-    public void product_list() { Assert.assertTrue(product != null); }
+    public void product_list() {  product.verifyProductListDisplayed();  }
 
     @When("the user adds product {string} and {string}")
     public void add_products(String p1, String p2) {

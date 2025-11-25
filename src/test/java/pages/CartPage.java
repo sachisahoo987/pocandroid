@@ -4,9 +4,9 @@ import base.BasePage;
 import base.DriverFactory;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.remote.RemoteWebElement;
 import utils.LocatorReader;
 
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,27 +20,34 @@ public class CartPage extends BasePage {
     public CartPage() { super(); }
 
     public double sumOfProductPrices() {
-        List<WebElement> prices = driver.findElements(productPriceBy);
-        return prices.stream()
-                .mapToDouble(e -> Double.parseDouble(e.getText().replaceAll("[^0-9.]", "")))
-                .sum();
+        return perform("Calculate Sum of Product Prices", () -> {
+            List<WebElement> prices = driver.findElements(productPriceBy);
+            return prices.stream()
+                    .mapToDouble(e -> Double.parseDouble(e.getText().replaceAll("[^0-9.]", "")))
+                    .sum();
+        });
     }
 
     public double displayedTotal() {
-        WebElement el = driver.findElement(totalAmountBy);
-        return Double.parseDouble(el.getText().replaceAll("[^0-9.]", ""));
+        return perform("Get Displayed Cart Total", () -> {
+            WebElement el = driver.findElement(totalAmountBy);
+            return Double.parseDouble(el.getText().replaceAll("[^0-9.]", ""));
+        });
     }
 
     public void openTerms() {
-        WebElement termsBtn = driver.findElement(termsBy);
-        try {
-            Map<String, Object> args = new HashMap<>();
-            args.put("elementId", ((org.openqa.selenium.remote.RemoteWebElement) termsBtn).getId());
-            args.put("duration", 2000);
-            DriverFactory.getDriver().executeScript("mobile: longClickGesture", args);
-        } catch (Exception e) {
-            // fallback: click
-            termsBtn.click();
-        }
+        perform("Open Terms & Conditions", () -> {
+            WebElement termsBtn = driver.findElement(termsBy);
+
+            try {
+                Map<String, Object> args = new HashMap<>();
+                args.put("elementId", ((RemoteWebElement) termsBtn).getId());
+                args.put("duration", 2000);
+                driver.executeScript("mobile: longClickGesture", args);
+            } catch (Exception e) {
+                termsBtn.click();
+            }
+        });
     }
+
 }

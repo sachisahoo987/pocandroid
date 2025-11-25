@@ -19,28 +19,37 @@ public class FormPage extends BasePage {
     public FormPage() { super(); }
 
     public void waitForFormReady() {
-        new WebDriverWait(driver, Duration.ofSeconds(30)).until(ExpectedConditions.visibilityOfElementLocated(nameField));
+        new WebDriverWait(driver, Duration.ofSeconds(30))
+                .until(ExpectedConditions.visibilityOfElementLocated(nameField));
     }
 
     public void enterName(String name) {
-        waitForFormReady();
-        WebElement nf = driver.findElement(nameField);
-        nf.clear();
-        nf.sendKeys(name);
-        try { driver.executeScript("mobile: hideKeyboard"); } catch (Exception ignored) {}
+        perform("Enter Name: " + name, () -> {
+            waitForFormReady();
+            WebElement nf = driver.findElement(nameField);
+            nf.clear();
+            nf.sendKeys(name);
+            try { driver.executeScript("mobile: hideKeyboard"); } catch (Exception ignored) {}
+        });
     }
 
     public void selectCountry(String country) {
-        driver.findElement(countrySpinner).click();
-        String uiScroll = String.format("new UiScrollable(new UiSelector().scrollable(true).instance(0))"
-                + ".scrollIntoView(new UiSelector().text(\"%s\").instance(0));", country);
-        WebElement countryToSelect =
-                driver.findElement(AppiumBy.androidUIAutomator(uiScroll));
+        perform("Select Country: " + country, () -> {
+            driver.findElement(countrySpinner).click();
 
-        countryToSelect.click();
+            String uiScroll = String.format(
+                    "new UiScrollable(new UiSelector().scrollable(true).instance(0))" +
+                            ".scrollIntoView(new UiSelector().text(\"%s\").instance(0));",
+                    country
+            );
+
+            driver.findElement(AppiumBy.androidUIAutomator(uiScroll)).click();
+        });
     }
 
     public void tapLetsShop() {
-        driver.findElement(letsShopBtn).click();
+        perform("Tap Let's Shop", () -> {
+            driver.findElement(letsShopBtn).click();
+        });
     }
 }

@@ -1,9 +1,10 @@
 package hooks;
 
 import base.DriverFactory;
-import io.cucumber.java.After;
-import io.cucumber.java.Before;
-import io.cucumber.java.Scenario;
+import io.cucumber.java.*;
+import io.qameta.allure.Allure;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
 import utils.ConfigReader;
 
 import java.io.ByteArrayInputStream;
@@ -15,99 +16,116 @@ import java.util.Map;
 
 public class Hooks {
 
+    private boolean shouldRecordVideo;
+    private boolean captureFailureScreenshot;
+
     @Before
     public void beforeScenario() {
 
         String platform = ConfigReader.getOrDefault("platform", "android");
         DriverFactory.initDriver(platform);
 
-        // Optimized MediaProjection recording to prevent System UI freeze
-        try {
-            Map<String, Object> params = new HashMap<>();
-            params.put("maxDurationSec", 1800);       // 30 minutes max
-            params.put("bitRate", 800000);            // Low bitrate = no freeze (0.8 Mbps)
-            params.put("videoType", "mp4");
-            params.put("resolution", "720x1280");     // Reduce load on emulator
-            params.put("bgRecording", true);          // prevents System UI blocking
+        // Only take screenshot on failure
+        captureFailureScreenshot = Boolean.parseBoolean(
+                System.getProperty(
+                        "failureShots",
+                        ConfigReader.getOrDefault("failure_screenshots", "true")
+                )
+        );
 
-            DriverFactory.getDriver().executeScript(
-                    "mobile: startMediaProjectionRecording",
-                    params
-            );
+        shouldRecordVideo = Boolean.parseBoolean(
+                System.getProperty(
+                        "recordVideo",
+                        ConfigReader.getOrDefault("record_video", "true")
+                )
+        );
 
-            System.out.println(">>> Optimized MediaProjection recording STARTED");
+        // -------- Start Screen Recording --------
+        if (shouldRecordVideo) {
+            try {
+                Map<String, Object> params = new HashMap<>();
+                params.put("maxDurationSec", 1800);
+                params.put("bitRate", 800000);
+                params.put("videoType", "mp4");
+                params.put("resolution", "720x1280");
 
-        } catch (Exception e) {
-            System.out.println(">>> FAILED to start optimized recording: " + e.getMessage());
+                DriverFactory.getDriver().executeScript(
+                        "mobile: startMediaProjectionRecording",
+                        params
+                );
+
+                System.out.println(">>> Video recording started");
+
+            } catch (Exception e) {
+                System.out.println(">>> Failed to start video recording: " + e.getMessage());
+            }
         }
     }
 
     @After
     public void afterScenario(Scenario scenario) {
 
-        byte[] videoBytes = null;
-        String base64Video = null;
-
-        // Retry stopping recording because Android 14/15 is slow to finalize MP4
-        for (int attempt = 1; attempt <= 5; attempt++) {
+        // -------- Screenshot Only On Failure --------
+        if (scenario.isFailed() && captureFailureScreenshot) {
             try {
-                base64Video = (String) DriverFactory.getDriver()
-                        .executeScript("mobile: stopMediaProjectionRecording");
+                byte[] screenshot = ((TakesScreenshot) DriverFactory.getDriver())
+                        .getScreenshotAs(OutputType.BYTES);
 
-                if (base64Video != null && !base64Video.isEmpty()) {
-                    System.out.println(">>> Recording STOPPED on attempt " + attempt);
-                    break;
-                } else {
-                    System.out.println(">>> Video not ready (attempt " + attempt + "), waiting...");
-                    Thread.sleep(1500);
-                }
-
-            } catch (Exception e) {
-                System.out.println(">>> Error stopping recording (attempt " + attempt + "): " + e.getMessage());
-                try { Thread.sleep(1500); } catch (Exception ignored) {}
-            }
-        }
-
-        // Decode Base64 (if any)
-        try {
-            if (base64Video != null && !base64Video.isEmpty()) {
-                videoBytes = Base64.getDecoder().decode(base64Video);
-            }
-        } catch (Exception ignored) {}
-
-        // Save video + Attach to Allure
-        try {
-            if (videoBytes != null) {
-
-                Files.createDirectories(Paths.get("test-output/videos"));
-
-                String filename = "test-output/videos/" +
-                        scenario.getName().replaceAll("\\s+", "_") + ".mp4";
-
-                Files.write(Paths.get(filename), videoBytes);
-                System.out.println(">>> Video saved: " + filename);
-
-                // Allure video attachment
-                io.qameta.allure.Allure.addAttachment(
-                        "Screen Recording",
-                        "video/mp4",
-                        new ByteArrayInputStream(videoBytes),
-                        ".mp4"
+                Allure.addAttachment(
+                        "Failure Screenshot",
+                        "image/png",
+                        new ByteArrayInputStream(screenshot),
+                        ".png"
                 );
 
-            } else {
-                System.out.println(">>> No video produced even after retry.");
+            } catch (Exception e) {
+                System.out.println(">>> Failed to capture failure screenshot: " + e.getMessage());
+            }
+        }
+
+        // -------- Stop Recording --------
+        if (shouldRecordVideo) {
+            String base64Video = null;
+
+            for (int i = 1; i <= 5; i++) {
+                try {
+                    base64Video = (String) DriverFactory.getDriver()
+                            .executeScript("mobile: stopMediaProjectionRecording");
+
+                    if (base64Video != null && !base64Video.isEmpty()) break;
+
+                    Thread.sleep(1200);
+
+                } catch (Exception e) {
+                    System.out.println(">>> Error stopping recording: " + e.getMessage());
+                }
             }
 
-        } catch (Exception e) {
-            System.out.println(">>> FAILED to save/attach video: " + e.getMessage());
+            if (base64Video != null) {
+                try {
+                    byte[] videoBytes = Base64.getDecoder().decode(base64Video);
+
+                    Files.createDirectories(Paths.get("test-output/videos"));
+
+                    String filename = "test-output/videos/" +
+                            scenario.getName().replaceAll("\\s+", "_") + ".mp4";
+
+                    Files.write(Paths.get(filename), videoBytes);
+
+                    Allure.addAttachment(
+                            "Scenario Video",
+                            "video/mp4",
+                            new ByteArrayInputStream(videoBytes),
+                            ".mp4"
+                    );
+
+                } catch (Exception ignored) {}
+            }
         }
 
-        // Quit driver
+        // -------- Quit Driver --------
         try {
             DriverFactory.quitDriver();
-        } catch (Exception e) {
-            System.out.println(">>> FAILED to quit driver: " + e.getMessage());
-        }
+        } catch (Exception ignored) {}
     }
 }

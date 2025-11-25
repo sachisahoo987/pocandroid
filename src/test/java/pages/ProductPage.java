@@ -17,34 +17,50 @@ public class ProductPage extends BasePage {
     public ProductPage() { super(); }
 
     public void addProductByName(String name) {
-        List<WebElement> names = driver.findElements(productNameBy);
-        List<WebElement> adds = driver.findElements(addCartBtnBy);
+        perform("Add Product: " + name, () -> {
 
-        for (int i = 0; i < names.size(); i++) {
-            if (names.get(i).getText().trim().equalsIgnoreCase(name.trim())) {
-                adds.get(i).click();
-                return;
+            List<WebElement> names = driver.findElements(productNameBy);
+            List<WebElement> adds = driver.findElements(addCartBtnBy);
+
+            for (int i = 0; i < names.size(); i++) {
+                if (names.get(i).getText().trim().equalsIgnoreCase(name.trim())) {
+                    adds.get(i).click();
+                    return;
+                }
             }
-        }
 
-        // scroll into view and re-query
-        String uiScroll = String.format("new UiScrollable(new UiSelector().scrollable(true).instance(0))"
-                + ".scrollIntoView(new UiSelector().text(\"%s\").instance(0));", name);
-        driver.findElement(AppiumBy.androidUIAutomator(uiScroll));
+            String uiScroll = String.format(
+                    "new UiScrollable(new UiSelector().scrollable(true).instance(0))" +
+                            ".scrollIntoView(new UiSelector().text(\"%s\"))",
+                    name
+            );
+            driver.findElement(AppiumBy.androidUIAutomator(uiScroll));
 
-        names = driver.findElements(productNameBy);
-        adds = driver.findElements(addCartBtnBy);
-        for (int i = 0; i < names.size(); i++) {
-            if (names.get(i).getText().trim().equalsIgnoreCase(name.trim())) {
-                adds.get(i).click();
-                return;
+            names = driver.findElements(productNameBy);
+            adds = driver.findElements(addCartBtnBy);
+
+            for (int i = 0; i < names.size(); i++) {
+                if (names.get(i).getText().trim().equalsIgnoreCase(name.trim())) {
+                    adds.get(i).click();
+                    return;
+                }
             }
-        }
 
-        throw new RuntimeException("Product not found: " + name);
+            throw new RuntimeException("Product not found: " + name);
+        });
     }
 
     public void goToCart() {
-        driver.findElement(cartBtnBy).click();
+        perform("Go To Cart", () -> driver.findElement(cartBtnBy).click());
     }
+
+    public void verifyProductListDisplayed() {
+        perform("Verify product list is displayed", () -> {
+            WebElement firstItem = driver.findElements(productNameBy).get(0);
+            if (!firstItem.isDisplayed()) {
+                throw new AssertionError("Product list not visible");
+            }
+        });
+    }
+
 }
